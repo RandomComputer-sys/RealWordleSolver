@@ -5,8 +5,39 @@ def getWord(self):
     num = random.randint(1,len(word_bank))
     return word_bank[num]
     
-def board():
-    get
+def board(self, ):
+    word = getWord()
+    guess = getInput()
 
-game = Wordle()
-print(game.getWord())
+    similer == set(word) & set(guess)
+    end_result = [0, 0, 0, 0, 0]
+    if similer == []:
+        return end_result
+
+    for i in similer:
+        if guess.index(similer[i]) == word.index(similer[i]):
+            end_result[guess.index(similer[i])] = 1
+        else:
+            num = 0
+            x = guess
+            for j in guess.count(similer[i]):
+                
+                end_result[x.index(similer[i]) + sum] = 2
+                num += 1
+
+    return end_result
+
+
+
+
+
+
+def getInput():
+    while True:
+        guess = input("Enter a 5 letter word")
+        if len(guess) != 5:
+            print('Guess must be 5 letters long')
+            break
+        else:
+            return list(guess)
+    
