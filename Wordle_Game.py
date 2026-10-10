@@ -8,13 +8,13 @@ class Wordle():
         guess = self.getInput()
         while guess == 0:
             guess = self.getInput()
-        
-        end_result = [ 0, 0, 0, 0, 0]
+        print(guess)
+        end_result = [ "0", "0", "0", "0", "0"]
         for i in range(5):
             if guess[i] == word[i]:
-                end_result[i] = 1
+                end_result[i] =  "1"
             elif guess[i] in word:
-                end_result[i] = 2
+                end_result[i] =  "2"
                         
         return end_result
 
@@ -27,7 +27,9 @@ class Wordle():
 
     def getInput(self):
         while True:
+            print("Enter a 5 letter word: ")
             guess = input("Enter a 5 letter word: ")
+            
             if len(guess) != 5:
                 print('Guess must be 5 letters long')
                 return 0
