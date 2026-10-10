@@ -6,6 +6,7 @@ class Main():
     
     def get_result():
         turn  = game.board(word)
+        print(turn)
 
     def create_input():
         pass

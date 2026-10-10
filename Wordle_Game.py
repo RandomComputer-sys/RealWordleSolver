@@ -4,18 +4,26 @@ class Wordle():
 
     def board(self, ran_word):
         word = ran_word
+        
         print(word)
         guess = self.getInput()
         while guess == 0:
             guess = self.getInput()
         print(guess)
+        x = word.copy()
         end_result = [ "0", "0", "0", "0", "0"]
-        for i in range(5):
-            if guess[i] == word[i]:
-                end_result[i] =  "1"
-            elif guess[i] in word:
-                end_result[i] =  "2"
+        for i in range(len(x)):
+            if guess[i] == x[i]:
+                x[i] = "0"
+                end_result[i] = "1"
+        
+        for j in range(len(x)):
+            if guess[j] in x:
+                match_index = x.index(guess[j])
+                x[match_index] = "0"
+                end_result[j] =  "2"
                         
+        
         return end_result
 
 
