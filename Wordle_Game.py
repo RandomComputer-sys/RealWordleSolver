@@ -2,7 +2,7 @@ import random
 class Wordle():
 
 
-    def board(self, ran_word, inputss):
+    def board(self, ran_word, inputss):#checks how close the guess was to the answer and returns a 1 for in the right place and a 2 for in the word but wrong spot.
         word = ran_word
         inputs = inputss
         print(word)
@@ -27,7 +27,7 @@ class Wordle():
         return end_result
 
 
-    def getWord(self):
+    def getWord(self): #700 word wordbank
         word_bank = ["about", "above", "actor", "acute", "admit", "adopt", "adult", "after", "again", "agent", 
     "agree", "ahead", "alarm", "album", "alert", "alike", "alive", "allot", "allow", "alone", 
     "along", "alter", "among", "anger", "angle", "angry", "apart", "apple", "apply", "arena", 
@@ -145,7 +145,7 @@ class Wordle():
     "zanza", "zapan", "zappy", "zarfs", "zaris", "zaxes", "zayin", "zazen", "zeals", "zebra"]
         
 
-    def getInput(self):
+    def getInput(self): #gets an input of the correct size
         while True:
             print("Enter a 5 letter word: ")
             guess = input("Enter a 5 letter word: ")
