@@ -154,8 +154,35 @@ class inputs():
         
         return bank
 
-    def change_file(self, guesseds):
-        pass
+
+
+
+    def change_file(self, guesseds, datas):
+        
+        guessed = guesseds[1]
+        data = datas[1]
+        bank = []
+        send_back = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        alpha = list(string.ascii_lowercase)
+
+        with open("Bots_Data.txt", "r") as file:
+            lines = file.readline()
+        letters = [int(x) for x in lines.split(",") if x.strip()]
+
+        for i in range(5):
+            if data[i] == 1:
+                letter = guessed[i].lower()
+                if letter in alpha:
+                    let_index = alpha.index(letter)
+                    letters[let_index] += 1
+                    send_back[let_index] +=1
+        
+        with open("Bots_Visuals", "w", encoding='utf-8') as file:
+            string_to_write = ",".join(map(str, send_back))
+            file.write(string_to_write)
+
+
+
 
 
 class Main():
@@ -191,7 +218,7 @@ class Main():
             initial_guess = inputs.initial(data, guessed)
             return initial_guess
 
-        inputs.change_file()
+        inputs.change_file(guessed, data)
         
 
 
