@@ -24,7 +24,7 @@ class Visuals():
                 
         while guesses < 6 and ([1, 1, 1, 1, 1,] not in data.values()):#runs the game for a maximum of 6 turn or until the word is guessed.
             print(word)
-            inputs = main.main(data, guesses, guessed) #calls for the bot to input a word.
+            inputs = Main.main(data, guesses, guessed) #calls for the bot to input a word.
             guessed[guesses] = inputs #saves the input to guessed
             data[guesses] = game.board(word, inputs)#calls the file that holds the rules to the game to compare and see how the bot did.
             
@@ -57,17 +57,108 @@ class inputs():
             elif data[row][index] == 0:
                 unknown[index] = guessed[row][index]
 
-
-
         return wrong_location, found, unknown #returns the letters 
 
+
+
+
+
     def create_input(self):
+        all_words = game.getWord().word_bank
+        new_word = [None, None, None, None, None]
+
+        with open("Bots_Data", "r") as file:
+            lines = file.readlines()
+
+        for i in range(1, 6):
+            record = lines[28 + i].strip()
+            record = list(record)
+            for j in range(5):
+                if record[j] != "0":
+                    new_word[j] = record[j]
+
+        all_words = [
+            word for word in all_words
+            if all(new_word[j] is None or word[j] == new_word[j] for j in range(5))
+        ]
+
+        for k in range(1, 6):
+            record_y = lines[35 + k].strip()#editing this for yellow letters.
+
+            for l in range(5):
+                char = record_y[l]
+                if char != "0":
+                    all_words = [
+                        word for word in all_words
+                        if char in word and word[l] != char
+                    ]
+
+        
+        for m in range(1, 6):
+            record_n = lines[42 + m].strip()#editing this for yellow letters.
+
+            for n in range(5):
+                char_n = record_n[n]
+                if char_n != "0":
+                    all_words = [
+                        word for word in all_words
+                        if char_n not in word
+                    ]
+        if all_words:
+            return list(all_words[0])
+        else:
+            return ["0", "0", "0", "0", "0", ]
+        
+
+         
+        
+
+
+
+
+
+
+    def initial(self, datas, guesseds ):
+        data = datas
+        guessed = guesseds
+        all_words = game.getWord().word_bank
+        bank = []
+        alpha = list(string.ascii_lowercase)
+        with open("Bots_Data.txt", "r") as file:
+            lines = file.readline()
+        letters = lines.split(",")
+        letters = [int(x) for x in letters]
+        for i in range(8):
+            largest = max(letters)
+            locate = letters.index(largest)
+            bank.append(alpha[locate])
+            letters[locate] = -1
+
+        count = 0
+        for j in range(5):
+            if bank[j] in "aeiouy":
+                count += 1
+
+        if count == 4:
+            bank[4], bank[6] = bank[6], bank[4]
+        elif count == 5:
+            bank[5], bank[7] = bank[7], bank[5]
+
+
+        for idx in range(5):
+            char = bank[idx]
+            all_words = [
+                word for word in all_words
+                if char in word
+            ]
+        
+        return bank
+
+    def change_file(self, guesseds):
         pass
 
-    def initial():
-        pass
 
-class main():
+class Main():
     def main(self, datas, guesses, guesseds):
         data = datas
         guess_num = guesses
@@ -95,9 +186,13 @@ class main():
 
 
             next_guess = inputs.create_input()
+            return next_guess
         else:
-            pass
+            initial_guess = inputs.initial(data, guessed)
+            return initial_guess
 
+        inputs.change_file()
+        
 
 
 Visuals.run_game()
