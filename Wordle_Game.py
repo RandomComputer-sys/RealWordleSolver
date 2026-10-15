@@ -26,8 +26,8 @@ class Wordle():
         
         return end_result
 
-
-    def getWord(self): #700 word wordbank
+    
+    def bank(self):
         word_bank = ["about", "above", "actor", "acute", "admit", "adopt", "adult", "after", "again", "agent", 
         "agree", "ahead", "alarm", "album", "alert", "alike", "alive", "allot", "allow", "alone", 
         "along", "alter", "among", "anger", "angle", "angry", "apart", "apple", "apply", "arena", 
@@ -143,6 +143,10 @@ class Wordle():
         "yahoo", "yaird", "yakin", "yakka", "yales", "yalta", "yamen", "yamms", "yangs", "yanks", 
         "yapok", "yapon", "yappy", "yards", "yarns", "yawls", "zaire", "zamia", "zanje", "zante", 
         "zanza", "zapan", "zappy", "zarfs", "zaris", "zaxes", "zayin", "zazen", "zeals", "zebra"]
+        return word_bank
+
+    def getWord(self): #700 word wordbank
+        word_bank = self.bank()
         word = random.randint(1, len(word_bank))
         return word_bank[word]
         
