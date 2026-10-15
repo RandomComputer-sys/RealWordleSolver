@@ -5,7 +5,7 @@ class Wordle():
     def board(self, ran_word, inputss):#checks how close the guess was to the answer and returns a 1 for in the right place and a 2 for in the word but wrong spot.
         word = ran_word
         inputs = inputss
-        print(word)
+        
         guess = inputs
         while guess == 0:
             guess = inputs

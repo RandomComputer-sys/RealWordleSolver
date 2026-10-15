@@ -24,23 +24,31 @@ class Visuals():
             5: [0, 0, 0, 0, 0]
         }
                 
-        while guesses < 6 and ([1, 1, 1, 1, 1,] not in data.values()):#runs the game for a maximum of 6 turn or until the word is guessed.
-            print(word)
-            inputs = runner.main(data, guesses, guessed) #calls for the bot to input a word.
-            guessed[guesses] = inputs #saves the input to guessed
-            data[guesses] = game.board(word, inputs)#calls the file that holds the rules to the game to compare and see how the bot did.
-            
-            
-            print(data[guesses])
-            guesses += 1
-        if [1, 1, 1, 1, 1,] not in data.values():#checks if the bot won or lost
-            print("You have run out of Guesses!")
-            print(data)
-                    
-        else:
-            print(f"You completed the Wordle in {guesses -1} trys!")
-            print(data)
+        game_won = False
 
+        while guesses <= 5:
+            print(f"Target word: {word}")
+
+            inputs = runner.main(data, guesses, guessed)
+            guessed[guesses] = inputs
+
+            result_score = game.board(word, inputs)
+            data[guesses] = result_score
+
+            print(f"Guess {guesses} result: {data[guesses]}")
+
+            if result_score == [1, 1, 1, 1, 1]:
+                game_won = True
+                break
+
+            guesses += 1
+        
+        if game_won:
+            print(f"You completed the Wordle in {guesses} trys!")
+            print(data)
+        else:
+            print("You have run out of guesses!")
+            print(data)
 
 
 class Runner():
@@ -63,6 +71,11 @@ class Runner():
 
             with open("Bots_Data", "r") as file:
                 lines = file.readlines()
+
+            target_max_index = max(change_f, change_wl, change_un)
+            while len(lines) <= target_max_index:
+                lines.append("\n")
+
             lines[change_f] = f + "\n"
             lines[change_wl] = wl + "\n"
             lines[change_un] = un + "\n"
@@ -72,12 +85,13 @@ class Runner():
 
 
             next_guess = inputed.create_input()
+            inputed.change_file(guessed, data)
             return next_guess
         else:
             initial_guess = inputed.initial(data, guessed)
             return initial_guess
 
-        inputed.change_file(guessed, data)
+        
 
 
 class Inputs():
@@ -108,8 +122,16 @@ class Inputs():
         all_words = game.bank()
         new_word = [None, None, None, None, None]
 
-        with open("Bots_Data", "r") as file:
-            lines = file.readlines()
+        try:
+
+            with open("Bots_Data", "r") as file:
+                lines = file.readlines()
+        except FileNotFoundError:
+            lines = []
+
+        if len(lines) < 50:
+            lines = ["0/n"] * 60
+
 
         for i in range(1, 6):
             record = lines[28 + i].strip()
@@ -162,8 +184,11 @@ class Inputs():
         alpha = list(string.ascii_lowercase)
         with open("Bots_Data", "r") as file:
             lines = file.readline()
-        letters = lines.split(",")
-        letters = [int(x) for x in letters]
+
+        if not lines.strip():
+            letters = [0] * 26
+        else:
+            letters = [int(x) for x in lines.split(",") if x.strip()]
         for i in range(8):
             largest = max(letters)
             locate = letters.index(largest)
@@ -188,7 +213,8 @@ class Inputs():
                 if char in word
             ]
         
-        return bank
+        
+        return bank[:5]
 
 
 
