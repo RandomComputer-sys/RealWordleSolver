@@ -1,41 +1,43 @@
 from Wordle_Game import Wordle
 import string
+import random
+
 game = Wordle()
 
 class Visuals():
-    def run_game(): #runs the actual wordle game.
+    @staticmethod
+    def run_game(): # runs the actual wordle game.
         game = Wordle()
         runner = Runner()
-        word = list(game.getWord()) #retrieves random word
+        word = list(game.getWord()) # retrieves random word
 
         guesses = 1
-        data = { #stores a 1 for in the right place and 2 for wrong place.
-            1: [0, 0, 0, 0, 0],
-            2: [0, 0, 0, 0, 0],
-            3: [0, 0, 0, 0, 0],
-            4: [0, 0, 0, 0, 0],
-            5: [0, 0, 0, 0, 0]
-        }
-        guessed = { #words that have been guessed
-            1: [0, 0, 0, 0, 0],
-            2: [0, 0, 0, 0, 0],
-            3: [0, 0, 0, 0, 0],
-            4: [0, 0, 0, 0, 0],
-            5: [0, 0, 0, 0, 0]
-        }
-                
+        data = {i: [0, 0, 0, 0, 0] for i in range(1, 8)}
+        guessed = {i: [0, 0, 0, 0, 0] for i in range(1, 8)}
+        
+        found = [None, None, None, None, None]
+        unknown = {}        
+        none = []
+
         game_won = False
 
-        while guesses <= 5:
+        while guesses <= 6:
+            print(f"\n--- Guess {guesses} ---")
             print(f"Target word: {word}")
 
-            inputs = runner.main(data, guesses, guessed)
+            # Correctly pass all tracking logs to runner.main
+            inputs = runner.main(data, guesses, guessed, found, none, unknown)
             guessed[guesses] = inputs
+            
+            print(f"Bot guessed: {''.join(inputs)}")
 
             result_score = game.board(word, inputs)
             data[guesses] = result_score
 
-            print(f"Guess {guesses} result: {data[guesses]}")
+            # Correctly align order of tracking structures
+            unknown, none, found = runner.update_log(unknown, none, found, data, guessed, guesses)    
+
+            print(f"Guess {guesses} result score: {data[guesses]}")
 
             if result_score == [1, 1, 1, 1, 1]:
                 game_won = True
@@ -44,211 +46,106 @@ class Visuals():
             guesses += 1
         
         if game_won:
-            print(f"You completed the Wordle in {guesses} trys!")
-            print(data)
+            print(f"\nYou completed the Wordle in {guesses} trys!")
         else:
-            print("You have run out of guesses!")
-            print(data)
+            print(f"\nYou have run out of guesses! The word was {''.join(word)}")
 
 
 class Runner():
-    def main(self, datas, guesses, guesseds):
+    def main(self, datas, guesses, guesseds, fnd, no, uk):
         inputed = Inputs()
-        data = datas
-        guess_num = guesses
-        guessed = guesseds
-
-        change_f = 28 + guess_num
-        change_wl = 35 + guess_num
-        change_un = 42 + guess_num
-
-        if guess_num > 1:
-            wl, f, un = inputed.get_result(data[guess_num], guess_num, guessed[guess_num]) #calls the get_result function so it can start making a guess
-
-            wl = "".join(str(num) for num in wl) #all of this updates the text file so that it can store information between guesses
-            f = "".join(str(num) for num in f)
-            un = "".join(str(num) for num in un)
-
-            with open("Bots_Data", "r") as file:
-                lines = file.readlines()
-
-            target_max_index = max(change_f, change_wl, change_un)
-            while len(lines) <= target_max_index:
-                lines.append("\n")
-
-            lines[change_f] = f + "\n"
-            lines[change_wl] = wl + "\n"
-            lines[change_un] = un + "\n"
-
-            with open("Bots_Data", "w") as file:
-                file.writelines(lines)
-
-
-            next_guess = inputed.create_input()
-            inputed.change_file(guessed, data)
-            return next_guess
+        
+        if guesses > 1:
+            next_words = inputed.create_input(fnd, no, uk)
+            
+            # FIXED: Grab the FIRST word string from the list, then split into characters
+            if isinstance(next_words, list) and len(next_words) > 0:
+                return list(next_words[0]) 
+            
+            return list("salet") # Fallback if no matching words remain
         else:
-            initial_guess = inputed.initial(data, guessed)
+            initial_guess = list(inputed.initial())
             return initial_guess
 
         
+    def update_log(self, uk, no, fnd, dta, gsd, gsnum):
+        found = fnd
+        unknown = uk
+        none = no
+        data = dta
+        guessed = gsd
+        
+        last_guess_idx = gsnum
+        unknown_cnt = len(unknown) + 1
+
+        for j in range(5):
+            letter = guessed[last_guess_idx][j]
+            status = data[last_guess_idx][j]
+
+            if status == 1:
+                found[j] = letter
+
+            elif status == 2:
+                letter_exists = False
+                for key, val in unknown.items():
+                    if val[0] == letter:  
+                        letter_exists = True
+                        break
+                
+                if not letter_exists:
+                    unknown[unknown_cnt] = [letter, status]
+                    unknown_cnt += 1
+
+            elif status == 0: 
+                if letter not in none:
+                    none.append(letter)
+                    
+        return unknown, none, found
 
 
 class Inputs():
-    
-    def get_result(self, info, guess_num, guessed_1):
-        data = info
-        guessed = guessed_1
-        row = guess_num
-        wrong_location = [0, 0, 0, 0, 0]
-        found = [0, 0, 0, 0, 0]
-        unknown = [0, 0, 0, 0, 0]
+    def create_input(self, fnd, no, uk):
+        all_words = game.bank()  
+        found = fnd
+        unknown = uk
+        none = no
+
+        filtered_words = []
+        yellow_letters = [val[0] for val in unknown.values()]
+
+        for word in all_words:  
+            keep_word = True
+            
+            for idx, letter in enumerate(found):
+                if letter and letter != 0 and word[idx] != letter:
+                    keep_word = False
+                    break
+            
+            if not keep_word:
+                continue
+
+            for letter in yellow_letters:
+                if letter not in word:
+                    keep_word = False
+                    break
+                    
+            if not keep_word:
+                continue
+
+            for letter in none:
+                if letter in word:
+                    if letter in found or letter in yellow_letters:
+                        continue
+                    keep_word = False
+                    break
+
+            if keep_word:
+                filtered_words.append(word)
+
+        return filtered_words
         
-        for index in range(5):#sorts the guess to see what letters were correct and which ones it has to move.
-            if data[index] == 1:
-                found[index] = guessed[index]
-            elif data[index] == 2:
-                wrong_location[index] = guessed[index]
-            elif data[index] == 0:
-                unknown[index] = guessed[index]
-
-        return wrong_location, found, unknown #returns the letters 
-
-
-
-
-
-    def create_input(self):
-        all_words = game.bank()
-        new_word = [None, None, None, None, None]
-
-        try:
-
-            with open("Bots_Data", "r") as file:
-                lines = file.readlines()
-        except FileNotFoundError:
-            lines = []
-
-        if len(lines) < 50:
-            lines = ["0/n"] * 60
-
-
-        for i in range(1, 6):
-            record = lines[28 + i].strip()
-            record = list(record)
-            for j in range(len(record)):
-                if record[j] != "0":
-                    new_word[j] = record[j]
-
-        all_words = [
-            word for word in all_words
-            if all(new_word[j] is None or word[j] == new_word[j] for j in range(5))
-        ]
-
-        for k in range(1, 6):
-            record_y = lines[35 + k].strip()#editing this for yellow letters.
-
-            for l in range(len(record_y)):
-                char = record_y[l]
-                if char != "0":
-                    all_words = [
-                        word for word in all_words
-                        if char in word and word[l] != char
-                    ]
-
-        
-        for m in range(1, 6):
-            record_n = lines[42 + m].strip()#editing this for yellow letters.
-
-            for n in range(len(record_n)):
-                char_n = record_n[n]
-                if char_n != "0":
-                    all_words = [
-                        word for word in all_words
-                        if char_n not in word
-                    ]
-        if all_words:
-            return list(all_words[0])
-        else:
-            return ["0", "0", "0", "0", "0", ]
-        
-
-         
-    
-
-    def initial(self, datas, guesseds ):
-        data = datas
-        guessed = guesseds
-        all_words = game.bank()
-        bank = []
-        alpha = list(string.ascii_lowercase)
-        with open("Bots_Data", "r") as file:
-            lines = file.readline()
-
-        if not lines.strip():
-            letters = [0] * 26
-        else:
-            letters = [int(x) for x in lines.split(",") if x.strip()]
-        for i in range(8):
-            largest = max(letters)
-            locate = letters.index(largest)
-            bank.append(alpha[locate])
-            letters[locate] = -1
-
-        count = 0
-        for j in range(5):
-            if bank[j] in "aeiouy":
-                count += 1
-
-        if count == 4:
-            bank[4], bank[6] = bank[6], bank[4]
-        elif count == 5:
-            bank[5], bank[7] = bank[7], bank[5]
-
-
-        for idx in range(5):
-            char = bank[idx]
-            all_words = [
-                word for word in all_words
-                if char in word
-            ]
-        
-        
-        return bank[:5]
-
-
-
-
-    def change_file(self, guesseds, datas):
-        
-        guessed = guesseds[1]
-        data = datas[1]
-        bank = []
-        send_back = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        alpha = list(string.ascii_lowercase)
-
-        with open("Bots_Data", "r") as file:
-            lines = file.readline()
-        letters = [int(x) for x in lines.split(",") if x.strip()]
-
-        for i in range(5):
-            if data[i] == 1:
-                letter = guessed[i].lower()
-                if letter in alpha:
-                    let_index = alpha.index(letter)
-                    letters[let_index] += 1
-                    send_back[let_index] +=1
-        
-        with open("Bots_Data", "w", encoding='utf-8') as file:
-            string_to_write = ",".join(map(str, send_back))
-            file.write(string_to_write)
-
-
-
-
-
-
-        
-
+    def initial(self):
+        bank = ["salet", "slate", "crane", "trace", "crate", "stare", "roate", "slant", "raise", "arose", "stale", "scale", "soare", "least", "carte", "dealt", "roast", "scone", "orate", "audio", "adieu", "canoe", "saute", "shale", "clasp"]
+        return random.choice(bank)
 
 Visuals.run_game()

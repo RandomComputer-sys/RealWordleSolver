@@ -1,34 +1,39 @@
 import random
+
 class Wordle():
 
-
-    def board(self, ran_word, inputss):#checks how close the guess was to the answer and returns a 1 for in the right place and a 2 for in the word but wrong spot.
-        word = ran_word
-        inputs = inputss
+    def board(self, ran_word, inputss):
         
-        guess = inputs
-        while guess == 0:
-            guess = inputs
-        print(guess)
+        word = list(ran_word) if isinstance(ran_word, str) else ran_word.copy()
+        guess = list(inputss) if isinstance(inputss, str) else inputss.copy()
+        
         x = word.copy()
-        end_result = [ "0", "0", "0", "0", "0"]
+        end_result = [0, 0, 0, 0, 0]
+        
+        
         for i in range(len(x)):
             if guess[i] == x[i]:
-                x[i] = "0"
-                end_result[i] = "1"
+                x[i] = "0"          
+                end_result[i] = 1   
+        
         
         for j in range(len(x)):
+            if end_result[j] == 1:
+                continue
+                
             if guess[j] in x:
                 match_index = x.index(guess[j])
-                x[match_index] = "0"
-                end_result[j] =  "2"
+                x[match_index] = "0" # Consume the letter
+                end_result[j] = 2    
                         
-        
         return end_result
 
-    
+    def getWord(self):
+        random_word = random.choice(self.bank())
+        return list(random_word)
+
     def bank(self):
-        word_bank = ["about", "above", "actor", "acute", "admit", "adopt", "adult", "after", "again", "agent", 
+        return ["about", "above", "actor", "acute", "admit", "adopt", "adult", "after", "again", "agent", 
         "agree", "ahead", "alarm", "album", "alert", "alike", "alive", "allot", "allow", "alone", 
         "along", "alter", "among", "anger", "angle", "angry", "apart", "apple", "apply", "arena", 
         "argue", "arise", "array", "arrow", "aside", "asset", "audio", "audit", "avoid", "award", 
@@ -102,62 +107,4 @@ class Wordle():
         "fiend", "fiery", "fifer", "fifes", "fifis", "fifth", "fifty", "figgy", "fight", "figos", 
         "fiked", "fikes", "filar", "filch", "filed", "filer", "files", "filet", "filii", "filks", 
         "fille", "fillo", "fills", "filly", "filme", "films", "filmy", "filos", "filth", "filum", 
-        "final", "finca", "finch", "finds", "fined", "finer", "fines", "finis", "finks", "finny", 
-        "finos", "fiord", "fiqhs", "fique", "fired", "firer", "fires", "firme", "firms", "firns", 
-        "firry", "first", "firth", "fishy", "fists", "fisty", "fitch", "fitly", "fitte", "fitts", 
-        "fiver", "fives", "fixed", "fixer", "fixes", "fixit", "fizzy", "gazer", "gecko", "ghost", "giant", "gland", "glove", "grace", "grand", "graph", "grasp", 
-        "grass", "grave", "great", "green", "greet", "grief", "grill", "grind", "groan", "gross", 
-        "group", "habit", "hairy", "handy", "happy", "hardy", "harsh", "haste", "hasty", "hatch", 
-        "haunt", "haven", "havoc", "hazel", "heads", "heard", "heart", "heath", "heavy", "hedge", 
-        "hefty", "icing", "ideal", "ideas", "idiom", "idiot", "idled", "idler", "idles", "idols", 
-        "idyll", "igloo", "image", "imbue", "impel", "imply", "inane", "inbox", "incur", "index", 
-        "indie", "jacks", "jacob", "jaded", "jades", "jaunt", "jazzy", "jeans", "jeeps", "jelly", 
-        "jerry", "jests", "jesus", "jeton", "jewel", "jewry", "jiffy", "jihad", "jilts", "jimmy", 
-        "jingo", "kails", "kales", "kalif", "kalpa", "kaons", "kapas", "kapok", "kappa", "karma", 
-        "kayak", "kebab", "keels", "keeps", "kelps", "kelpy", "kenaf", "kenos", "kenya", 
-        "kepis", "labor", "laced", "laces", "lacey", "lacks", "laded", "laden", "lades", "ladle", 
-        "lager", "laird", "lairs", "laity", "lakes", "lamas", "lambs", "lamed", "lamer", "lames", 
-        "lamps", "macro", "madam", "madly", "mafia", "magic", "magma", "maids", "mails", "maims", 
-        "mains", "maize", "major", "maker", "makes", "males", "malts", "malty", "mamma", "mammy", 
-        "nadir", "naggy", "naiad", "naifs", "nails", "naive", "naked", "named", "namer", "names", 
-        "nanas", "nancy", "nanny", "naomi", "napes", "narco", "narcs", "nardy", "nasal", "nasty", 
-        "ocean", "ochre", "octal", "octet", "odder", "oddly", "odeon", "odors", "odour", "offal", 
-        "offed", "offer", "often", "ogled", "ogler", "ogles", "ogres", "oiled", "oiler", "olive", 
-        "pabby", "paced", "pacer", "pacha", "packs", "pacts", "paddy", "padre", "paean", 
-        "pagan", "paged", "pager", "pages", "pails", "pains", "paint", "pairs", "palms", "qadis", 
-        "qaids", "qanat", "quack", "quads", "quaff", "quags", "quail", "quake", "quaky", "quale", 
-        "qualm", "quant", "quark", "quart", "quash", "quasi", "queen", "queer", "query", "rabbi", 
-        "rabid", "raced", "racer", "races", "racks", "radar", "radix", "radon", "rafts", "ragas", 
-        "raged", "rages", "raggy", "rails", "rains", "rainy", "raise", "rajah", "rally", "saber", 
-        "sable", "sabot", "sabre", "sacks", "sacra", "sadly", "safes", "safer", "sagas", "sager", 
-        "sages", "saggy", "sahib", "saiks", "sails", "saint", "saith", "salad", "tabby", "table", 
-        "taboo", "tabor", "tacit", "tacks", "tacky", "tacos", "tacts", "taffy", "tails", "taint", 
-        "taken", "taker", "takes", "tales", "talks", "talky", "tally", "udder", "udons", "ugali", 
-        "uhlan", "uhuru", "uigur", "ulcer", "ulema", "ulnae", "ulnar", "ulnas", "ultra", "umami", 
-        "umbel", "umber", "umbra", "umiak", "unbar", "uncle", "uncut", "vacua", "vague", "vagus", 
-        "vails", "vales", "valet", "valid", "valor", "value", "valve", "vamps", "vampy", "vanda", 
-        "vanes", "vaped", "vaper", "vapes", "vapid", "vapor", "vault", "wafer", "wafts", "waged", 
-        "wager", "wages", "wagon", "wahoo", "waifs", "wails", "wains", "waist", "waits", "waive", 
-        "waked", "waken", "waker", "wakes", "waldo", "wales", "walks", "xebec", "xenia", "xenic", 
-        "xenon", "xeric", "xerox", "xiles", "xints", "xiphs", "xylem", "yacht", "yager", "yages", 
-        "yahoo", "yaird", "yakin", "yakka", "yales", "yalta", "yamen", "yamms", "yangs", "yanks", 
-        "yapok", "yapon", "yappy", "yards", "yarns", "yawls", "zaire", "zamia", "zanje", "zante", 
-        "zanza", "zapan", "zappy", "zarfs", "zaris", "zaxes", "zayin", "zazen", "zeals", "zebra"]
-        return word_bank
-
-    def getWord(self): #700 word wordbank
-        word_bank = self.bank()
-        word = random.randint(1, len(word_bank))
-        return word_bank[word]
-        
-
-    def getInput(self): #gets an input of the correct size
-        while True:
-            print("Enter a 5 letter word: ")
-            guess = input("Enter a 5 letter word: ")
-            
-            if len(guess) != 5:
-                print('Guess must be 5 letters long')
-                return 0
-            else:
-                return list(guess)
+        "final", "finca", "finch", "finds", "fined"]
