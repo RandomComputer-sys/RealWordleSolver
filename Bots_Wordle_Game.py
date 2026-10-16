@@ -25,7 +25,7 @@ class Visuals():
             print(f"\n--- Guess {guesses} ---")
             print(f"Target word: {word}")
 
-            # Correctly pass all tracking logs to runner.main
+            # Correctly pas all tracking logs to runner.main
             inputs = runner.main(data, guesses, guessed, found, none, unknown)
             guessed[guesses] = inputs
             
@@ -58,7 +58,6 @@ class Runner():
         if guesses > 1:
             next_words = inputed.create_input(fnd, no, uk)
             
-            # FIXED: Grab the FIRST word string from the list, then split into characters
             if isinstance(next_words, list) and len(next_words) > 0:
                 return list(next_words[0]) 
             
